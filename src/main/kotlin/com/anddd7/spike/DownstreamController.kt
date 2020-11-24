@@ -27,8 +27,14 @@ class DownstreamController(
   }
 
   @GetMapping("/{path}")
-  fun call(@PathVariable path: String): String =
-    restTemplate.getForObject("/${path}")
+  fun oneLevelCall(@PathVariable path: String): String {
+    return restTemplate.getForObject("/${path}")
+  }
+
+  @GetMapping("/downstream/{path}")
+  fun twoLevelCall(@PathVariable path: String): String {
+    return restTemplate.getForObject("/downstream/${path}")
+  }
 }
 
 

@@ -14,8 +14,10 @@ data:
   APP_ENV: k8s
   SERVICE_NAME_A: spike-app-a
   SERVICE_NAME_B: spike-app-b
+  SERVICE_NAME_C: spike-app-c
   DOWNSTREAM_URL_A: http://spike-app-b-svc:8080
-  DOWNSTREAM_URL_B: http://spike-app-a-svc:8080
+  DOWNSTREAM_URL_B: http://spike-app-c-svc:8080
+  DOWNSTREAM_URL_C: http://spike-app-a-svc:8080
 
 ---
 
@@ -28,7 +30,7 @@ spec:
   selector:
     matchLabels:
       app: spike-app-a
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -36,7 +38,8 @@ spec:
     spec:
       containers:
         - name: spike-app
-          image: anddd7/spike-app:v1
+          image: anddd7/spike-app
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -68,7 +71,7 @@ spec:
   selector:
     matchLabels:
       app: spike-app-b
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -76,7 +79,8 @@ spec:
     spec:
       containers:
         - name: spike-app
-          image: anddd7/spike-app:v1
+          image: anddd7/spike-app
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -96,6 +100,61 @@ spec:
                 configMapKeyRef:
                   name: spike-app-config
                   key: DOWNSTREAM_URL_B
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spike-app-c
+  namespace: spike-app
+spec:
+  selector:
+    matchLabels:
+      app: spike-app-c
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spike-app-c
+    spec:
+      containers:
+        - name: spike-app
+          image: anddd7/spike-app
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: APP_ENV
+            - name: SERVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: SERVICE_NAME_C
+            - name: DOWNSTREAM_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: DOWNSTREAM_URL_C
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spike-app-azure
+  namespace: spike-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: spike-app-a
+  ports:
+    - port: 8080
 
 ---
 
@@ -121,10 +180,24 @@ metadata:
   name: spike-app-b-svc
   namespace: spike-app
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: spike-app-b
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30008
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spike-app-c-svc
+  namespace: spike-app
+spec:
+  type: ClusterIP
+  selector:
+    app: spike-app-c
+  ports:
+    - port: 8080
+      targetPort: 8080
