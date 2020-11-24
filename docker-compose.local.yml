@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  spike-app-a:
+    image: spike-app:v1
+    container_name: spike-app-a
+    environment:
+      - APP_ENV=local
+      - SERVICE_NAME=spike-app-a
+      - DOWNSTREAM_URL=http://spike-app-b:8080
+    ports:
+      - 8081:8080
+  spike-app-b:
+    image: spike-app:v1
+    container_name: spike-app-b
+    environment:
+      - APP_ENV=local
+      - SERVICE_NAME=spike-app-b
+      - DOWNSTREAM_URL=http://spike-app-a:8080
+    ports:
+      - 8082:8080

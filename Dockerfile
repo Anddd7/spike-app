@@ -6,7 +6,7 @@ ARG IMAGE_VERSION
 ENV JAVA_OPTS=$JAVA_OPTS
 ENV IMAGE_VERSION=$IMAGE_VERSION
 
-COPY ./config/docker/entrypoint.sh /usr/local/bin/
+COPY ./entrypoint.sh /usr/local/bin/
 COPY ./build/libs/spike-app-*.jar app.jar
 
 EXPOSE 8080
