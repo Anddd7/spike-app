@@ -1,0 +1,13 @@
+- 不同调用关系的API
+    - A
+    - A - B
+    - A - BC
+    - A - B - C
+- 开启所有日志    
+- correlation id
+- dockerfile
+- dockercompose本地测试
+- k8s化
+
+- 放入azure
+- terraform化
