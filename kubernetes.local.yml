@@ -19,63 +19,83 @@ data:
 
 ---
 
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: spike-app-a
   namespace: spike-app
-  labels:
-    app: spike-app-a
 spec:
-  containers:
-    - name: spike-app
-      image: anddd7/spike-app:v1
-      env:
-        - name: APP_ENV
-          valueFrom:
-            configMapKeyRef:
-              name: spike-app-config
-              key: APP_ENV
-        - name: SERVICE_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: spike-app-config
-              key: SERVICE_NAME_A
-        - name: DOWNSTREAM_URL
-          valueFrom:
-            configMapKeyRef:
-              name: spike-app-config
-              key: DOWNSTREAM_URL_A
+  selector:
+    matchLabels:
+      app: spike-app-a
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: spike-app-a
+    spec:
+      containers:
+        - name: spike-app
+          image: anddd7/spike-app:v1
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: APP_ENV
+            - name: SERVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: SERVICE_NAME_A
+            - name: DOWNSTREAM_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: DOWNSTREAM_URL_A
 
 ---
 
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: spike-app-b
   namespace: spike-app
-  labels:
-    app: spike-app-b
 spec:
-  containers:
-    - name: spike-app
-      image: anddd7/spike-app:v1
-      env:
-        - name: APP_ENV
-          valueFrom:
-            configMapKeyRef:
-              name: spike-app-config
-              key: APP_ENV
-        - name: SERVICE_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: spike-app-config
-              key: SERVICE_NAME_B
-        - name: DOWNSTREAM_URL
-          valueFrom:
-            configMapKeyRef:
-              name: spike-app-config
-              key: DOWNSTREAM_URL_B
+  selector:
+    matchLabels:
+      app: spike-app-b
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: spike-app-b
+    spec:
+      containers:
+        - name: spike-app
+          image: anddd7/spike-app:v1
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: APP_ENV
+            - name: SERVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: SERVICE_NAME_B
+            - name: DOWNSTREAM_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: spike-app-config
+                  key: DOWNSTREAM_URL_B
 
 ---
 
